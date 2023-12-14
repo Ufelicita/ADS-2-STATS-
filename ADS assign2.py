@@ -9,7 +9,8 @@ Total Greenhouse emmisions (kt of co2), Manufacturing Value Added.
  Created December 1, 2023
 
 
-@author: Felicita Adeleke (Student Id : )
+@author: Felicita Adeleke (Student Id : 22026653 )
+
 """
 
 
@@ -35,6 +36,8 @@ def read(filename, index_col):
         years_df A :Transposed dataframe with years  as columns
         countries_df: Transposed dataframe with countries as columns
     """
+    
+    
     # Read csv file
     df = pd.read_csv(filename)
 
@@ -87,42 +90,50 @@ GDP (current US$), Forest area (sq. km),Total greenhouse gas emissions
 (kt of CO2 equivalent)
 
 """
-          
+   
+       
 # Calculate descriptive analysis for United Kindgom             
 uk_descb = df_t.xs("United Kingdom", level=0, axis=1).agg("describe")
+print(uk_descb)
 
 # Calculate Skewness  for United Kingdom 
 uk_skew = df_t.xs("United Kingdom", level=0, axis=1).agg("skew")
-
+print(uk_skew)
 
 # Calculate Kurtosis for United Kingdom 
 uk_kurtosis = df_t.xs("United Kingdom", level=0, axis=1).agg("kurtosis")
-
+print(uk_kurtosis)
       
 # Calculate descriptive analysis for India 
 India_descb = df_t.xs("India", level=0, axis=1).agg("describe")
+print(India_descb)
 
 # Calculate skewness for India 
 India_Skew = df_t.xs("India", level=0, axis=1).agg("skew")
+print(India_Skew)
 
 # Calculate kurtosis for India 
-India_kurtosis = df_t.xs("India", level=0, axis=1).agg("skew") 
+India_kurtosis = df_t.xs("India", level=0, axis=1).agg("kurtosis") 
+print(India_kurtosis)
 
-# Calculate kurtosis  for South
-South_Africa_kurtosis = df_t.xs("South Africa", level=0,
-                                axis=1).agg("kurtosis") 
-
-# Calculate kurtosis  for South
+# Calculate descriptive analysis  for South Africa
 South_Africa_describe = df_t.xs("South Africa", level=0,
                                 axis=1).agg("describe")  
-                                               
-# Calculate  analysis for India 
-South_Africa__describe= df_t.xs("South Africa", level=0,
-                                axis=1).agg("describe")
+print(South_Africa_describe)
 
-# Calculate skewness for India 
-South_Africa_skew = df_t.xs("South Africa", level=0, axis=1).agg("skew")  
+# Calculate  Skew analysis for South Africa
+South_Africa_skew = df_t.xs("South Africa", level=0,
+                                axis=1).agg("skew")
+print(South_Africa_skew)
+
+# Calculate Kurtosis  analysis for South Africa
+South_Africa_kurtosis = df_t.xs("South Africa", level=0,
+                                 axis=1).agg("kurtosis")
+print(South_Africa_kurtosis)
 
 
-# Calculate kurtosis  for India 
-India_descb = df_t.xs("India", level=0, axis=1).agg("kurtosis")  
+
+
+
+
+
