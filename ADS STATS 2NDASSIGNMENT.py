@@ -65,7 +65,6 @@ def read(filename):
 
     return df_world_data,   df_world_data_t1
 
-
 # Analyse the DataFrame
 df_world_data, df_world_data_t1 = read("worldBDATA1.csv")
 
