@@ -110,69 +110,95 @@ print(f"\ndf_df_summary_stats_skew saved to {excel_file_path}")
 print(f"\ndf_df_summary_stats_kurtosis saved to {excel_file_path}")
 
 
-def plot_kendall_heatmap(df_world_data):
+def plot_kendall_heatmap(df_world_data, country_name, title):
     """
     Generates a Kendall correlation heatmap for selected indicators.
 
     Args:
-    - df_world_data (pd.DataFrame): Input DataFrame 
+    - df_world_data (pd.DataFrame): Input DataFrame
 
     Returns:
     None: Displays the Kendall correlation heatmap.
     """
-    
 
     df_worldbank = df_world_data.reset_index()
     df_worldbank.dropna()
 
-    # Melt the DataFrame specifying multiple years in value_vars
-    df_worldbank_melt = pd.melt(df_worldbank, id_vars=["Country Name",
-                                                   "Series Name"],
-                                var_name="Year",
-                                value_name="Value")
+    # Filter  DataFrame for  specific country
+    df_country = df_worldbank[df_worldbank['Country Name'] == country_name]
 
-    df_worldbank_melt = df_worldbank_melt.iloc[120:480, :]
+    # Drop columns with missing values
+    df_country = df_country.dropna(axis=1)
 
-    df_worldbank_melt['Value'] = pd.to_numeric(df_worldbank_melt['Value'],
-                                           errors='coerce')
-
-    # Pivot the melted DataFrame
-    pivot_df_worldbank = df_worldbank_melt.pivot_table(index=["Country Name"],
-                                                   columns="Series Name",
-                                                   values="Value",
-                                                   aggfunc="mean")
-
-    pivot_df_worldbank = pivot_df_worldbank.reset_index()
+   # Melt the DataFrame specifying multiple years in value_vars
+    df_country_melt = pd.melt(df_country, id_vars=['Country Name',
+                                                   'Series Name',
+                                                   'Series Code',
+                                                   'Country Code'],
+                              var_name='Year',
+                              value_name='Value')
+    df_pivoted = df_country_melt.pivot_table(index='Year',
+                                             columns='Series Code',
+                                             values='Value',
+                                             aggfunc='mean')
 
     # Extract numeric columns for correlation analysis
-    df_numeric_cols = pivot_df_worldbank.drop('Country Name', axis=1)
+    df_numeric_cols = df_pivoted.select_dtypes(include=['float64', 'int64'])
 
     # Calculate Kendall correlation matrix
-    df_corr_matrix = df_numeric_cols.corr()
+    df_corr_matrix = df_numeric_cols.corr(method='kendall')
 
     # Create a heatmap
     plt.figure(figsize=(10, 8))
     heat_map = sns.heatmap(df_corr_matrix, annot=True,
-                           cmap='coolwarm', linewidths=.5)
-    
-    # Customize title
-    plt.title("Selected Indicators Correlation Heatmap",fontsize=18, 
-              fontweight='bold')
+                           cmap="cool", linewidths=.5,
+                           annot_kws={"weight": "bold", "size": 10,
+                                      "color": 'black'})
 
-    # Customize labels and ticks 
+   # Customize title
+    plt.title(title, fontweight='bold')
+
+    # Customize labels
+    plt.xlabel("Indicators", fontweight='bold')
+    plt.ylabel("Indicators", fontweight='bold')
+
+    # Customize labels and ticks
     plt.xlabel("Indicators", fontsize=14,  fontweight='bold')
     plt.ylabel("Indicators", fontsize=14, fontweight='bold')
-    heat_map.set_xticklabels(heat_map.get_xticklabels(), 
-                            fontsize=12, rotation=90)
-    heat_map.set_yticklabels(heat_map.get_yticklabels(), 
-                            fontsize=12, rotation=0)
-    plt.savefig("heat_map.png")
+    heat_map.set_xticklabels(heat_map.get_xticklabels(),
+                             fontsize=12, rotation=90)
+    heat_map.set_yticklabels(heat_map.get_yticklabels(),
+                             fontsize=12, rotation=0)
+
+    # Create a legend mapping Series Code to Series Name
+   # Add a legend mapping Series Code to Series Name
+    legend_labels = df_country_melt[[
+        'Series Code', 'Series Name']].drop_duplicates()
+    legend_labels = dict(
+        zip(legend_labels['Series Code'], legend_labels['Series Name']))
+
+    # Add spaces after ":" in each label and adjust legend placement
+    handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='w',
+                          # markersize=10,
+                          label=f"${code}:$ {name}    ") for code,
+               name in legend_labels.items()]
+
+    # Adjust legend font size and style
+    plt.legend(handles=handles, title='Legend',
+               bbox_to_anchor=(1.05, -0.39),
+               loc='lower left', fontsize=12, title_fontsize=14,
+               prop={'weight': 'bold'})
+
     plt.show()
-    
+
     return
 
 
-plot_kendall_heatmap(df_world_data)
+plot_kendall_heatmap(df_world_data, country_name="China",
+                     title=f"Kendall Correlation Heatmap for China")
+
+plot_kendall_heatmap(df_world_data, country_name="United States",
+                     title=f"Kendall Correlation Heatmap for United States")
 
 
 def plot_bar_plot(df):
@@ -190,10 +216,10 @@ def plot_bar_plot(df):
 
     # Plot graph and customer labels and title
     df_melt.plot.bar(figsize=(10, 6), ylabel="Square Metres",
-                     xlabel= "Countries",)
+                     xlabel="Countries",)
     plt.title("Comparison between population Density & Arable lands")
-    
-    # Customize font size and weight for labels and title 
+
+    # Customize font size and weight for labels and title
     plt.ylabel("Square Metres", fontsize=14, fontweight='bold')
     plt.xlabel("Countries", fontsize=14, fontweight='bold')
     plt.title("Comparison between Population Density & Arable Lands",
@@ -254,7 +280,6 @@ def plot_line_plot(df, title, ylabel):
     None: Displays the line plot.
     """
 
-
     plt.figure(figsize=(10, 8))
 
     # Plot graph and customer labels and title
@@ -297,7 +322,7 @@ df_gdp.index.names = ["Year"]
 
 # call the line plot function with values or GDP(Current US$)
 plot_line_plot(df_gdp,
-               title="Trends in GDP in Selected  Countries in the World",
+               title="Trends in GDP in Selected  Countries ",
                ylabel="GDP (current US$")
 
 # Subset a new DataFrame for preferred indicator from df_world_data
