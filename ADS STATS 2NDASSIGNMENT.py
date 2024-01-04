@@ -175,7 +175,6 @@ def plot_kendall_heatmap(df_world_data):
 plot_kendall_heatmap(df_world_data)
 
 
-
 def plot_bar_plot(df):
     """
     Plots a grouped plot to show the comparisons of Arable and Agricultural
@@ -217,7 +216,6 @@ def plot_bar_plot(df):
 df_bar = df_world_data_t1.iloc[:, 10:40]
 
 df_bar_t = df_bar.transpose()
-
 
 df_bar_t = df_bar_t.iloc[10:30, :]
 
