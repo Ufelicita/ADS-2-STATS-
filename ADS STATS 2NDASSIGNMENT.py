@@ -152,16 +152,21 @@ def plot_kendall_heatmap(df_world_data):
 
     # Create a heatmap
     plt.figure(figsize=(10, 8))
-    sns.heatmap(df_corr_matrix, annot=True, cmap='coolwarm', linewidths=.5)
+    heat_map = sns.heatmap(df_corr_matrix, annot=True,
+                           cmap='coolwarm', linewidths=.5)
     
     # Customize title
     plt.title("Selected Indicators Correlation Heatmap",fontsize=18, 
               fontweight='bold')
 
-    # Customize labels
+    # Customize labels and ticks 
     plt.xlabel("Indicators", fontsize=14,  fontweight='bold')
     plt.ylabel("Indicators", fontsize=14, fontweight='bold')
-    
+    heat_map.set_xticklabels(heat_map.get_xticklabels(), 
+                            fontsize=12, rotation=90)
+    heat_map.set_yticklabels(heat_map.get_yticklabels(), 
+                            fontsize=12, rotation=0)
+    plt.savefig("heat_map.png")
     plt.show()
     
     return
