@@ -212,6 +212,7 @@ def plot_bar_plot(df):
     None: Displays the Grouped Bar  plot.
     """
 
+
     plt.figure()
 
     # Plot graph and customer labels and title
@@ -279,6 +280,7 @@ def plot_line_plot(df, title, ylabel):
     Returns:
     None: Displays the line plot.
     """
+
 
     plt.figure(figsize=(10, 8))
 
