@@ -121,6 +121,7 @@ def plot_kendall_heatmap(df_world_data, country_name, title):
     None: Displays the Kendall correlation heatmap.
     """
 
+
     df_worldbank = df_world_data.reset_index()
     df_worldbank.dropna()
 
