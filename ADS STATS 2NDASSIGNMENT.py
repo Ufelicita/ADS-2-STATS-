@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 20 11:20:15 2023
-
-@author: User
-"""
 
 # -*- coding: utf-8 -*-
 """
@@ -19,12 +13,12 @@ Created December 20, 2023
 
 
 # Import necessary libraries
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as scipy
+
 
 def read(filename):
     """
@@ -39,6 +33,7 @@ def read(filename):
         years_df A :Transposed dataframe with years  as columns
         countries_df: Transposed dataframe with countries as columns
     """
+
 
     # Read csv file
     df_world_data = pd.read_csv(filename)
@@ -64,6 +59,7 @@ def read(filename):
     print(df_world_data_t1.dtypes)
 
     return df_world_data,   df_world_data_t1
+
 
 # Analyse the DataFrame
 df_world_data, df_world_data_t1 = read("worldBDATA1.csv")
@@ -114,51 +110,68 @@ print(f"\ndf_df_summary_stats_skew saved to {excel_file_path}")
 print(f"\ndf_df_summary_stats_kurtosis saved to {excel_file_path}")
 
 
-"""
-using Kendall correlation and a heatmap to understand correlations (
-or lack of) between indicators and trends change with time.
-"""
+def plot_kendall_heatmap(df_world_data):
+    """
+    Generates a Kendall correlation heatmap for selected indicators.
 
+    Args:
+    - df_world_data (pd.DataFrame): Input DataFrame 
 
-df_worldbank = df_world_data.reset_index()
-df_worldbank.dropna()
+    Returns:
+    None: Displays the Kendall correlation heatmap.
+    """
+    
 
-# Melt the DataFrame specifying multiple years in value_vars
-df_worldbank_melt = pd.melt(df_worldbank, id_vars=["Country Name",
+    df_worldbank = df_world_data.reset_index()
+    df_worldbank.dropna()
+
+    # Melt the DataFrame specifying multiple years in value_vars
+    df_worldbank_melt = pd.melt(df_worldbank, id_vars=["Country Name",
                                                    "Series Name"],
-                            var_name="Year",
-                            value_name="Value")
+                                var_name="Year",
+                                value_name="Value")
 
-df_worldbank_melt = df_worldbank_melt.iloc[120:480, :]
+    df_worldbank_melt = df_worldbank_melt.iloc[120:480, :]
 
-df_worldbank_melt['Value'] = pd.to_numeric(df_worldbank_melt['Value'],
+    df_worldbank_melt['Value'] = pd.to_numeric(df_worldbank_melt['Value'],
                                            errors='coerce')
 
-# Pivot the melted DataFrame
-pivot_df_worldbank = df_worldbank_melt.pivot_table(index=["Country Name"],
+    # Pivot the melted DataFrame
+    pivot_df_worldbank = df_worldbank_melt.pivot_table(index=["Country Name"],
                                                    columns="Series Name",
                                                    values="Value",
                                                    aggfunc="mean")
 
-pivot_df_worldbank = pivot_df_worldbank.reset_index()
+    pivot_df_worldbank = pivot_df_worldbank.reset_index()
 
-print(pivot_df_worldbank)
+    # Extract numeric columns for correlation analysis
+    df_numeric_cols = pivot_df_worldbank.drop('Country Name', axis=1)
 
-# Extract numeric columns for correlation analysis
-df_numeric_cols = pivot_df_worldbank.drop('Country Name', axis=1)
+    # Calculate Kendall correlation matrix
+    df_corr_matrix = df_numeric_cols.corr()
 
-# Calculate Kendall correlation matrix
-df_corr_matrix = df_numeric_cols.corr()
+    # Create a heatmap
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df_corr_matrix, annot=True, cmap='coolwarm', linewidths=.5)
+    
+    # Customize title
+    plt.title("Selected Indicators Correlation Heatmap",fontsize=18, 
+              fontweight='bold')
 
-# Create a heatmap
-plt.figure(figsize=(10, 8))
-sns.heatmap(df_corr_matrix, annot=True, cmap='coolwarm', linewidths=.5)
+    # Customize labels
+    plt.xlabel("Indicators", fontsize=14,  fontweight='bold')
+    plt.ylabel("Indicators", fontsize=14, fontweight='bold')
+    
+    plt.show()
+    
+    return
 
-plt.title("Selected Indicators Correlation Heatmap")
-plt.show()
+
+plot_kendall_heatmap(df_world_data)
 
 
-def plot_bar_plot(df, ylabel):
+
+def plot_bar_plot(df):
     """
     Plots a grouped plot to show the comparisons of Arable and Agricultural
     lands in 10 different countries in the world
@@ -172,9 +185,15 @@ def plot_bar_plot(df, ylabel):
     plt.figure()
 
     # Plot graph and customer labels and title
-    df.plot.bar()
-
+    df_melt.plot.bar(figsize=(10, 6), ylabel="Square Metres",
+                     xlabel= "Countries",)
     plt.title("Comparison between population Density & Arable lands")
+    
+    # Customize font size and weight for labels and title 
+    plt.ylabel("Square Metres", fontsize=14, fontweight='bold')
+    plt.xlabel("Countries", fontsize=14, fontweight='bold')
+    plt.title("Comparison between Population Density & Arable Lands",
+              fontsize=16, fontweight='bold')
 
     # Set legend and  Title
     plt.legend(bbox_to_anchor=(1.02, 1))
@@ -216,11 +235,8 @@ df_melt["Arable land(per sqm)"] = df_melt["Arable land (hectares)"]*0.0001
 # Delete the Column with Arable land in hectares
 df_melt.drop("Arable land (hectares)", axis=1, inplace=True)
 
-
-# Plot group bar chart
-df_melt.plot.bar(figsize=(10, 6))
-
-plot_bar_plot(df_bar_melt, ylabel="square meteres ")
+# plot Bar graph
+plot_bar_plot(df_bar_melt)
 
 
 def plot_line_plot(df, title, ylabel):
@@ -234,6 +250,7 @@ def plot_line_plot(df, title, ylabel):
     Returns:
     None: Displays the line plot.
     """
+
 
     plt.figure(figsize=(10, 8))
 
@@ -277,7 +294,8 @@ df_gdp.index.names = ["Year"]
 
 # call the line plot function with values or GDP(Current US$)
 plot_line_plot(df_gdp,
-               title="Trends in GDP in Selected  Countries in the World", ylabel="GDP (current US$")
+               title="Trends in GDP in Selected  Countries in the World",
+               ylabel="GDP (current US$")
 
 # Subset a new DataFrame for preferred indicator from df_world_data
 df_co2_emmisions = df_world_data.iloc[40:50]
@@ -297,4 +315,5 @@ df_co2_emmisions.index.names = ["Year"]
 
 # call the line plot function with values or GDP(Current US$)
 plot_line_plot(df_co2_emmisions,
-               title="Trends in C02 Emissions(Kt) in Selected Countries in the World", ylabel="CO2 emissions (kt)")
+               title="Trends in C02 Emissions(Kt) in Selected Countries",
+               ylabel="CO2 emissions (kt)")
